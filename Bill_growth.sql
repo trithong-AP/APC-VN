@@ -57,3 +57,4 @@ left join shopee_vn_s1.apc_account_vn_db__user_tab u on tb1.merchant_id = u.merc
 left JOIN shopee_vn.apc_agent_vn_db__merchant_agent_tab ma ON m.id = ma.merchant_id
 left JOIN shopee_vn.apc_agent_vn_db__agent_tab a ON ma.agent_id = a.id
 where m.merchant_source = 60000 and u.role = 1
+--test change
