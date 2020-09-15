@@ -8,9 +8,9 @@ with first_topup as
         where t.type = 1 and t.status = 4
         and t.topup_channel = 1
         and t.bank_id not in (5,8)
-        and date_trunc('month', t.create_time - interval '1' hour) = date '2020-08-01'
+        and date_trunc('month', t.create_time - interval '1' hour) = date '2020-09-01'
         and w.status in (2) 
-        and date_trunc('month', from_unixtime(w.create_time - 3600)) = date '2020-08-01'
+        and date_trunc('month', from_unixtime(w.create_time - 3600)) = date '2020-09-01'
         -- and t.uid = 300041744
         group by 1
     ),
@@ -23,15 +23,15 @@ first_date_topup as
         left join (select uid, min(date(create_time - interval '1' hour)) first_topup_date 
                 from shopee_vn.apc_transaction_vn_db__transaction_tab
                 where type = 1 and status = 4 and topup_channel = 1 and bank_id in (5, 8)
-                and date_trunc('month', create_time - interval '1' hour) = date '2020-08-01'
+                and date_trunc('month', create_time - interval '1' hour) = date '2020-09-01'
                 group by 1) t1 on t.uid = t1.uid
         left join shopee_vn_s1.apc_wallet_vn_db__bank_account_tab w on t.uid = w.user_id
         where t.type = 1 and t.status = 4
         and t.topup_channel = 1
         and t.bank_id in (5,8)
-        and date_trunc('month', t.create_time - interval '1' hour) = date '2020-08-01'
+        and date_trunc('month', t.create_time - interval '1' hour) = date '2020-09-01'
         and w.status in (2) 
-        and date_trunc('month', from_unixtime(w.create_time - 3600)) = date '2020-08-01'
+        and date_trunc('month', from_unixtime(w.create_time - 3600)) = date '2020-09-01'
         -- and t.uid = 300041744
         group by 1
     )
