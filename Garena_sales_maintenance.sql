@@ -24,15 +24,15 @@ from
 (SELECT --sửa ngày
 o.merchant_id,
 count(distinct(case when date_trunc('month', from_unixtime(o.payment_time - 3600)) = date '2020-08-01' then date(from_unixtime(o.payment_time - 3600)) end)) count_sales_day,
-coalesce(round(sum(case when date_trunc('month', from_unixtime(o.payment_time - 3600)) = date '2020-06-01'  then o.total_discount_price end)/100000,0),0) as gppc_prevm,
-coalesce(round(sum(case when date_trunc('month', from_unixtime(o.payment_time - 3600)) = date '2020-07-01'  then o.total_discount_price end)/100000,0),0) as gppc_lam,
+coalesce(round(sum(case when date_trunc('month', from_unixtime(o.payment_time - 3600)) = date '2020-06-01'  and o.carrier_name = 'Garena'  then o.total_discount_price end)/100000,0),0) as gppc_prevm,
+coalesce(round(sum(case when date_trunc('month', from_unixtime(o.payment_time - 3600)) = date '2020-07-01'  and o.carrier_name = 'Garena'  then o.total_discount_price end)/100000,0),0) as gppc_lam,
 greatest(
-    coalesce(round(sum(case when date_trunc('month', from_unixtime(o.payment_time - 3600)) = date '2020-06-01'  then o.total_discount_price end)/100000,0),0),
-    coalesce(round(sum(case when date_trunc('month', from_unixtime(o.payment_time - 3600)) = date '2020-07-01'  then o.total_discount_price end)/100000,0),0)
+    coalesce(round(sum(case when date_trunc('month', from_unixtime(o.payment_time - 3600)) = date '2020-06-01'  and o.carrier_name = 'Garena'  then o.total_discount_price end)/100000,0),0),
+    coalesce(round(sum(case when date_trunc('month', from_unixtime(o.payment_time - 3600)) = date '2020-07-01'  and o.carrier_name = 'Garena' then o.total_discount_price end)/100000,0),0)
 ) calculated_gppc,
-coalesce(round(sum(case when date_trunc('month', from_unixtime(o.payment_time - 3600)) = date '2020-08-01'  then o.total_discount_price end)/100000,0),0) as gppc_thm
+coalesce(round(sum(case when date_trunc('month', from_unixtime(o.payment_time - 3600)) = date '2020-08-01'  and o.carrier_name = 'Garena' then o.total_discount_price end)/100000,0),0) as gppc_thm
 from shopee_vn.apc_dp_vn_db__order_tab o 
-where o.status = 'Completed' and o.carrier_name = 'Garena'
+where o.status = 'Completed' and o.carrier_name <> 'Ví Việt'
 group by 1 ) x
 ) 
 select 
