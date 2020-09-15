@@ -1,7 +1,7 @@
 with sales as(
     select
         m.id merchant_id,
-        sum(case when o.status = 'Completed' and o.carrier_name = 'Garena' and date_trunc('month', from_unixtime(o.payment_time - 3600)) = date '2020-07-01' then total_discount_price else 0 end)/100000 rev_lam
+        sum(case when o.status = 'Completed' and o.carrier_name = 'Garena' and date_trunc('month', from_unixtime(o.payment_time - 3600)) = date '2020-08-01' then total_discount_price else 0 end)/100000 rev_lam
     from
         airpay_vn.airpay_merchant_info_vn_db__merchant_info_tab m
         left join
@@ -23,8 +23,8 @@ topup as (
         sum(t.amount)/100000 top_up_amt_thm
     from shopee_vn.apc_transaction_vn_db__transaction_tab t
         left join shopee_vn_s1.apc_wallet_vn_db__bank_account_tab w on t.uid = w.user_id
-    where t.type = 1 and t.status = 4
-        and date_trunc('month', t.create_time - interval '1' hour) = date '2020-08-01'
+    where t.type in (1, 5) and t.status = 4
+        and date_trunc('month', t.create_time - interval '1' hour) = date '2020-09-01'
         and w.status in (2,3)
     group by 1
 )
@@ -41,11 +41,11 @@ CASE
    ELSE 'South'
 END region_name,
 ma.agent_id,
-a.agent_name,
+a.name agent_name,
 s.rev_lam,
 coalesce(t.top_up_amt_thm, 0) top_up_amt_thm,
 case
-when rev_lam = 0 and top_up_amt_thm >= 1000000 then 1 else 0
+when rev_lam <= 2000000 and top_up_amt_thm >= 2000000 then 1 else 0
 end bonus
 from sales s
 left join airpay_vn.airpay_merchant_info_vn_db__merchant_info_tab m on s.merchant_id = m.id
