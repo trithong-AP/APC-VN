@@ -23,7 +23,7 @@ topup_giro as (
     left join shopee_vn_s1.apc_account_vn_db__user_tab u on t.to_uid = u.uid
     where u.role = 1
     and t.type = 1 and t.status = 4 and t.topup_channel = 1
-    and first_GIRO_link_date < date '2020-08-01'
+    and first_GIRO_link_date < date '2020-09-01'
     group by 1
 ),
 calculated_sales as (
