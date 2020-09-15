@@ -8,19 +8,19 @@ bill_thm,
 
 case 
 -- when calculated_bill >= 30 then 4 
-when calculated_bill > 20 and calculated_bill < 30 then 3
-when calculated_bill > 10 and calculated_bill <= 20 then 2 
-when calculated_bill >= 1 and calculated_bill <= 10 then 1
+when calculated_bill >= 20 and calculated_bill < 30 then 3
+when calculated_bill >= 10 and calculated_bill < 20 then 2 
+when calculated_bill >= 1 and calculated_bill < 10 then 1
 else 0 end as class
 from
 (SELECT
 o.merchant_id,
-coalesce(count(distinct case when date_trunc('month', from_unixtime(o.payment_time - 3600)) = date '2020-06-01' then o.order_id end), 0) as bill_prevm,
-coalesce(count(distinct case when date_trunc('month', from_unixtime(o.payment_time - 3600)) = date '2020-07-01' then o.order_id end), 0) as bill_lam,
+coalesce(count(distinct case when date_trunc('month', from_unixtime(o.payment_time - 3600)) = date '2020-07-01' then o.order_id end), 0) as bill_prevm,
+coalesce(count(distinct case when date_trunc('month', from_unixtime(o.payment_time - 3600)) = date '2020-08-01' then o.order_id end), 0) as bill_lam,
 greatest(
-    coalesce(count(distinct case when date_trunc('month', from_unixtime(o.payment_time - 3600)) = date '2020-06-01' then o.order_id end), 0),
-    coalesce(count(distinct case when date_trunc('month', from_unixtime(o.payment_time - 3600)) = date '2020-07-01' then o.order_id end), 0)) calculated_bill,
-coalesce(count(distinct case when date_trunc('month', from_unixtime(o.payment_time - 3600)) = date '2020-08-01' then o.order_id end), 0) as bill_thm
+    coalesce(count(distinct case when date_trunc('month', from_unixtime(o.payment_time - 3600)) = date '2020-07-01' then o.order_id end), 0),
+    coalesce(count(distinct case when date_trunc('month', from_unixtime(o.payment_time - 3600)) = date '2020-08-01' then o.order_id end), 0)) calculated_bill,
+coalesce(count(distinct case when date_trunc('month', from_unixtime(o.payment_time - 3600)) = date '2020-09-01' then o.order_id end), 0) as bill_thm
 from shopee_vn.apc_dp_vn_db__order_tab o
 where o.status = 'Completed' and o.category_name = 'Utilities' and total_discount_price/100000 >= 20000
 group by 1) x
@@ -57,4 +57,3 @@ left join shopee_vn_s1.apc_account_vn_db__user_tab u on tb1.merchant_id = u.merc
 left JOIN shopee_vn.apc_agent_vn_db__merchant_agent_tab ma ON m.id = ma.merchant_id
 left JOIN shopee_vn.apc_agent_vn_db__agent_tab a ON ma.agent_id = a.id
 where m.merchant_source = 60000 and u.role = 1
---test change
