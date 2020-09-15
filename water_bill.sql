@@ -8,7 +8,7 @@ with data as (
     shopee_vn.apc_dp_vn_db__refund_tab r on o.order_id = r.order_id
     where 1=1
     and r.order_id is null --loai don hang refund
-    and date_trunc('month', from_unixtime(o.payment_time) - interval '1' hour) = date '2020-08-01'
+    and date_trunc('month', from_unixtime(o.payment_time) - interval '1' hour) = date '2020-09-01'
     and lower(o.product_show_name) in ('water')
     and total_discount_price/100000 >= 20000
     and o.status = 'Completed'
@@ -28,6 +28,8 @@ CASE
 END region_name,
 count_order,
 case when m.city in ('TP Hồ Chí Minh','Hà Nội','Hà Tây') then least(floor(count_order/30)*60000,  2000000)
+     when m.city in ('Kiên Giang','Tiền Giang','Nghệ An','Bắc Giang','Quảng Trị','Ninh Bình','Cần Thơ','Bạc Liêu','Hải Phòng','Khánh Hòa')
+        then least(floor(count_order/10)*20000,  1000000)
      else least(floor(count_order/20)*40000,  2000000) end as bonus
 from data d
 left join airpay_vn.airpay_merchant_info_vn_db__merchant_info_tab m on d.merchant_id = m.id
