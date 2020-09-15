@@ -8,7 +8,7 @@ with data as (
     shopee_vn.apc_dp_vn_db__refund_tab r on o.order_id = r.order_id
     where 1=1
     and r.order_id is null --loai don hang refund
-    and date_trunc('month', from_unixtime(o.payment_time) - interval '1' hour) = date '2020-08-01'
+    and date_trunc('month', from_unixtime(o.payment_time) - interval '1' hour) = date '2020-09-01'
     and lower(o.product_show_name) in ('electricity')
     and total_discount_price/100000 >= 20000
     and o.status = 'Completed'
