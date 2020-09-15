@@ -7,7 +7,7 @@ gppc_lam,
 calculated_gppc,
 gppc_thm,
 case 
-when count_sales_day = 31 then -- sửa số ngày bán
+when count_sales_day = 14 then -- sửa số ngày bán
     case
     when calculated_gppc >= 50000000 then 5
     when calculated_gppc >= 20000000 and calculated_gppc < 50000000 then 4
@@ -23,14 +23,14 @@ from
 
 (SELECT --sửa ngày
 o.merchant_id,
-count(distinct(case when date_trunc('month', from_unixtime(o.payment_time - 3600)) = date '2020-08-01' then date(from_unixtime(o.payment_time - 3600)) end)) count_sales_day,
-coalesce(round(sum(case when date_trunc('month', from_unixtime(o.payment_time - 3600)) = date '2020-06-01'  and o.carrier_name = 'Garena'  then o.total_discount_price end)/100000,0),0) as gppc_prevm,
-coalesce(round(sum(case when date_trunc('month', from_unixtime(o.payment_time - 3600)) = date '2020-07-01'  and o.carrier_name = 'Garena'  then o.total_discount_price end)/100000,0),0) as gppc_lam,
+count(distinct(case when date_trunc('month', from_unixtime(o.payment_time - 3600)) = date '2020-09-01' then date(from_unixtime(o.payment_time - 3600)) end)) count_sales_day,
+coalesce(round(sum(case when date_trunc('month', from_unixtime(o.payment_time - 3600)) = date '2020-07-01'  and o.carrier_name = 'Garena'  then o.total_discount_price end)/100000,0),0) as gppc_prevm,
+coalesce(round(sum(case when date_trunc('month', from_unixtime(o.payment_time - 3600)) = date '2020-06-01'  and o.carrier_name = 'Garena'  then o.total_discount_price end)/100000,0),0) as gppc_lam,
 greatest(
-    coalesce(round(sum(case when date_trunc('month', from_unixtime(o.payment_time - 3600)) = date '2020-06-01'  and o.carrier_name = 'Garena'  then o.total_discount_price end)/100000,0),0),
-    coalesce(round(sum(case when date_trunc('month', from_unixtime(o.payment_time - 3600)) = date '2020-07-01'  and o.carrier_name = 'Garena' then o.total_discount_price end)/100000,0),0)
+    coalesce(round(sum(case when date_trunc('month', from_unixtime(o.payment_time - 3600)) = date '2020-07-01'  and o.carrier_name = 'Garena'  then o.total_discount_price end)/100000,0),0),
+    coalesce(round(sum(case when date_trunc('month', from_unixtime(o.payment_time - 3600)) = date '2020-06-01'  and o.carrier_name = 'Garena' then o.total_discount_price end)/100000,0),0)
 ) calculated_gppc,
-coalesce(round(sum(case when date_trunc('month', from_unixtime(o.payment_time - 3600)) = date '2020-08-01'  and o.carrier_name = 'Garena' then o.total_discount_price end)/100000,0),0) as gppc_thm
+coalesce(round(sum(case when date_trunc('month', from_unixtime(o.payment_time - 3600)) = date '2020-09-01'  and o.carrier_name = 'Garena' then o.total_discount_price end)/100000,0),0) as gppc_thm
 from shopee_vn.apc_dp_vn_db__order_tab o 
 where o.status = 'Completed' and o.carrier_name <> 'Ví Việt'
 group by 1 ) x
@@ -50,7 +50,7 @@ a.id agent_id, a.name agent_name,
        WHEN a.region = 3 THEN 'Central'
        ELSE 'South'
    END region_name,
-case when m.extra_rev >= 1000000 then
+case when m.extra_rev >= 0 then
          case m.class when 1 then 2
                      when 2 then 4
                      when 3 then 6
