@@ -70,19 +70,33 @@ non_chainstore as (
         where m.merchant_source = 60000 and u.role = 1 and m.m_status = 1
         group by 1
     ),
-    active as (
+    a1 as (
         select
             valid_date,
-            count(distinct(o1.merchant_id)) a1_w_txn,
-            count(distinct(o7.merchant_id)) a7_w_txn,
-            count(distinct(o30.merchant_id)) a30_w_txn
+            count(distinct(o1.merchant_id)) a1_w_txn
         from select_date s
             left join shopee_vn_s1.apc_dp_vn_db__order_tab o1 on s.valid_date = date(from_unixtime(o1.payment_time - 3600))
-            left join shopee_vn_s1.apc_dp_vn_db__order_tab o7 on s.valid_date >= date(from_unixtime(o7.payment_time - 3600)) and s.valid_date - interval '7' day < date(from_unixtime(o7.payment_time - 3600))
-            left join shopee_vn_s1.apc_dp_vn_db__order_tab o30 on s.valid_date >= date(from_unixtime(o30.payment_time - 3600)) and s.valid_date - interval '30' day < date(from_unixtime(o30.payment_time - 3600))
         where
-            o1.status = 'Completed' and o1.carrier_name <> 'Ví Việt' and
-            o7.status = 'Completed' and o7.carrier_name <> 'Ví Việt' and
+            o1.status = 'Completed' and o1.carrier_name <> 'Ví Việt'
+        group by 1
+    ),
+    a7 as (
+        select
+            valid_date,
+            count(distinct(o7.merchant_id)) a7_w_txn
+        from select_date s
+            left join shopee_vn_s1.apc_dp_vn_db__order_tab o7 on s.valid_date >= date(from_unixtime(o7.payment_time - 3600)) and s.valid_date - interval '7' day < date(from_unixtime(o7.payment_time - 3600))
+        where
+            o7.status = 'Completed' and o7.carrier_name <> 'Ví Việt'
+        group by 1
+    ),
+    a30 as (
+        select
+            valid_date,
+            count(distinct(o30.merchant_id)) a30_w_txn
+        from select_date s
+           left join shopee_vn_s1.apc_dp_vn_db__order_tab o30 on s.valid_date >= date(from_unixtime(o30.payment_time - 3600)) and s.valid_date - interval '30' day < date(from_unixtime(o30.payment_time - 3600))
+        where
             o30.status = 'Completed' and o30.carrier_name <> 'Ví Việt'
         group by 1
     ),
@@ -132,9 +146,9 @@ non_chainstore as (
         o.*,
         new_merchants,
         new_giro_merchants,
-        a.a1_w_txn,
-        a.a7_w_txn,
-        a.a30_w_txn,
+        a1.a1_w_txn,
+        a7.a7_w_txn,
+        a30.a30_w_txn,
         r.refund_txn,
         r.refund_amt,
         tm.total_merchants,
@@ -142,7 +156,9 @@ non_chainstore as (
         t.*
     from order_related o
         left join new_merchant nm using(valid_date)
-        left join active a using(valid_date)
+        left join a1 a1 using(valid_date)
+        left join a7 a7 using(valid_date)
+        left join a30 a30 using(valid_date)
         left join refund r using(valid_date)
         left join total_merchant tm using(valid_date)
         left join topup t using(valid_date)
