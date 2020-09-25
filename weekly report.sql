@@ -53,7 +53,7 @@ non_chainstore as (
             round(sum(case when o.category_name = 'E-wallet' and o.carrier_name in ('Ví Việt') and o.status = 'Completed' then o.total_discount_price end)/100000/23000,0) as ViViet_gtv,
             round(sum(case when o.category_name = 'Printer' and o.status = 'Completed' then o.total_discount_price end)/100000/23000,0) as otherproducts_gtv,
             
-            (sum(commission) + sum(product_price - product_discount_price))/100000 commission
+            (sum(commission) + sum(product_price - product_discount_price))/2300000000 commission
         from select_date s
             left join shopee_vn_s1.apc_dp_vn_db__order_tab o on s.valid_date = date(from_unixtime(o.payment_time - 3600))
         group by 1
