@@ -8,9 +8,9 @@ with first_topup as
         where t.type = 1 and t.status = 4
         and t.topup_channel = 1
         and t.bank_id not in (5,8)
-        and date_trunc('month', t.create_time - interval '1' hour) = date '2020-09-01'
+        and date_trunc('month', t.create_time - interval '1' hour) = date '2020-10-01'
         and w.status in (2) 
-        and date_trunc('month', from_unixtime(w.create_time - 3600)) = date '2020-09-01'
+        and date_trunc('month', from_unixtime(w.create_time - 3600)) = date '2020-10-01'
         -- and t.uid = 300041744
         group by 1
     ),
@@ -23,15 +23,15 @@ first_date_topup as
         left join (select uid, min(date(create_time - interval '1' hour)) first_topup_date 
                 from shopee_vn.apc_transaction_vn_db__transaction_tab
                 where type = 1 and status = 4 and topup_channel = 1 and bank_id in (5, 8)
-                and date_trunc('month', create_time - interval '1' hour) = date '2020-09-01'
+                and date_trunc('month', create_time - interval '1' hour) = date '2020-10-01'
                 group by 1) t1 on t.uid = t1.uid
         left join shopee_vn_s1.apc_wallet_vn_db__bank_account_tab w on t.uid = w.user_id
         where t.type = 1 and t.status = 4
         and t.topup_channel = 1
         and t.bank_id in (5,8)
-        and date_trunc('month', t.create_time - interval '1' hour) = date '2020-09-01'
+        and date_trunc('month', t.create_time - interval '1' hour) = date '2020-10-01'
         and w.status in (2) 
-        and date_trunc('month', from_unixtime(w.create_time - 3600)) = date '2020-09-01'
+        and date_trunc('month', from_unixtime(w.create_time - 3600)) = date '2020-10-01'
         -- and t.uid = 300041744
         group by 1
     )
@@ -62,5 +62,5 @@ left JOIN shopee_vn.apc_agent_vn_db__agent_tab a ON ma.agent_id = a.id
 left join (select merchant_id, max_by(category, create_time) category from airpay_vn.airpay_merchant_info_vn_db__outlet_info_tab group by 1) ou on ou.merchant_id = u.merchant_id
 where 1=1
 -- and u.merchant_id in (300041744)
-and u.role = 1 and merchant_source = 60000
+and u.role = 1 and merchant_source = 60000 and m.m_type <> 3
 and ou.category <> 6

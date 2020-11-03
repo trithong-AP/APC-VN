@@ -12,7 +12,7 @@ with data as (
     shopee_vn.apc_dp_vn_db__refund_tab r on o.order_id = r.order_id
     where 1=1
     and r.order_id is null --loai don hang refund
-    and date_trunc('month', from_unixtime(o.payment_time) - interval '1' hour) = date '2020-09-01'
+    and date_trunc('month', from_unixtime(o.complete_time) - interval '1' hour) = date '2020-10-01'
     and lower(o.product_show_name) in ('financial services')
     and total_discount_price/100000 >= 20000
     and o.status = 'Completed'
@@ -46,5 +46,5 @@ left join shopee_vn_s1.apc_account_vn_db__user_tab u on b.merchant_id = u.mercha
 left JOIN shopee_vn.apc_agent_vn_db__merchant_agent_tab ma ON m.id = ma.merchant_id
 left JOIN shopee_vn.apc_agent_vn_db__agent_tab a ON ma.agent_id = a.id
 where b.merchant_id not in (2000005,2000006,2000015,2000014,2016945,2013241,2000017,2014288,2020316,2000008,2000004)
-and u.role = 1 and m.merchant_source = 60000
+and u.role = 1 and m.merchant_source = 60000 and m.m_type <> 3
 group by 1, 2, 3, 4, 5, 6, 7

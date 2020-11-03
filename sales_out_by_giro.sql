@@ -4,9 +4,9 @@ sales as (
     select
     o.merchant_id,
     
-    coalesce(round(sum(case when date_trunc('month', from_unixtime(o.payment_time - 3600)) = date_trunc('month', current_date - interval '3' month) then o.total_discount_price else 0 end)/100000,0),0) as sales_prevm,
-    coalesce(round(sum(case when date_trunc('month', from_unixtime(o.payment_time - 3600)) = date_trunc('month', current_date - interval '2' month) then o.total_discount_price else 0 end)/100000,0),0) as sales_lam,
-    coalesce(round(sum(case when date_trunc('month', from_unixtime(o.payment_time - 3600)) = date_trunc('month', current_date - interval '1' month) then o.total_discount_price else 0 end)/100000,0),0) as sales_thm
+    coalesce(round(sum(case when date_trunc('month', from_unixtime(o.complete_time - 3600)) = date_trunc('month', current_date - interval '3' month) then o.total_discount_price else 0 end)/100000,0),0) as sales_prevm,
+    coalesce(round(sum(case when date_trunc('month', from_unixtime(o.complete_time - 3600)) = date_trunc('month', current_date - interval '2' month) then o.total_discount_price else 0 end)/100000,0),0) as sales_lam,
+    coalesce(round(sum(case when date_trunc('month', from_unixtime(o.complete_time - 3600)) = date_trunc('month', current_date - interval '1' month) then o.total_discount_price else 0 end)/100000,0),0) as sales_thm
     from shopee_vn_s1.apc_dp_vn_db__order_tab o
     where 1=1
     and o.status = 'Completed' and o.category_name not in ('E-wallet')
@@ -23,7 +23,7 @@ topup_giro as (
     left join shopee_vn_s1.apc_account_vn_db__user_tab u on t.to_uid = u.uid
     where u.role = 1
     and t.type = 1 and t.status = 4 and t.topup_channel = 1
-    and first_GIRO_link_date < date '2020-09-01'
+    and first_GIRO_link_date < date '2020-10-01'
     group by 1
 ),
 calculated_sales as (
