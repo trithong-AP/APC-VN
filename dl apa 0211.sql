@@ -109,7 +109,7 @@ with
                 when tb1.payment_channel_id in (30002,30003,30004,30005,30006,30007,30008,30009,30010,30011,30012,30013,30014,30015,30016,30017,30018,30019,30020,30021,30022,30023) then 'other_games'
                 when tb1.payment_channel_id in (500001) then 'Shopee'
                 when tb1.payment_channel_id in (21001) then 'P2P'
-                when tb1.payment_channel_id in (21071) then 'QR' -- hay in (21070,21071) chị Lan check
+                when tb1.payment_channel_id in (21070) then 'QR'
                 when tb1.payment_channel_id in (35001) then 'bhd'
                 else 'other' end as category,
                 tb1.extra_data,
@@ -120,7 +120,7 @@ with
             from airpay_vn.airpay_payment_txn_vn_db__txn_order_tab tb1
                 left join airpay_vn.airpay_payment_txn_stats_vn_db__order_extra_tab tb2 on tb1.order_id= tb2.order_id
             where 1=1
-                and date(from_unixtime(payment_valid_time-3600)) >= current_date - interval '7' day
+                and date(from_unixtime(payment_valid_time-3600)) >= current_date - interval '5' day
                 and tb1.memo <> 'test'
                 and tb1.topup_channel_id not in (11100,13002,13003,13004,13009,13010,13011,13103) --câu lấy in-app cost không có, chị Lan chek
                 and tb1.payment_channel_id not in (21000, 21002,21003,21004,21005,21006,21007,21008,21009,100021011,100021016,
@@ -129,9 +129,17 @@ with
                 100021040,100021041,100021042,100021043,100001,110012,210001,210002,210003,210004,
                 210005,210006,210007,210008,210009,210010,210011,210013,210014,210015,210016,210017,
                 210018,21031,21032,21033,21034,21035,21039,10200077,10200086,10200092,10200097,11000001,11000002,
-                310001,310002,11000003,100021013,100021014,100021015,21070,21011,31000,31001,21074)
-                and not (payment_payable_amount < 2000000000 and tb1.payment_channel_id in (21070,21071)) --câu lấy in-app cost không có, chị Lan chek
-                and not (payment_payable_amount < 100000000 and tb1.payment_channel_id =500001) --câu lấy in-app cost không có, chị Lan chek
+                310001,310002,11000003,100021013,100021014,100021015,21070,21011,31000,31001,21074,
+                379017, --kotoro
+                379004, --Payoo CsB Dynamic
+                379001, --boft
+                379003, --7eleven
+                379041, --vufood
+                379043, --Kootoro Smart POS
+                379047 --BsC 1024746 - AIRPAY-41983
+                )
+                and not (payment_payable_amount < 2000000000 and tb1.payment_channel_id in (21070))
+                and not (payment_payable_amount < 100000000 and tb1.payment_channel_id =500001)
             ) a on a.date = sd.date
         group by 1
     ),
@@ -189,8 +197,7 @@ with
             --from beepay_txn_vn_db__order_tab a 
         from select_date sd 
              left join airpay_vn.airpay_payment_txn_vn_db__txn_order_tab a on date(from_unixtime(a.valid_time-3600))  between date - interval '29' day and date 											                                                 
-        where 1=1 
-            and date(from_unixtime(a.valid_time-3600)) between current_date - interval '60' day and current_date - interval '1' day	
+        where 1=1
             --where date(from_unixtime(valid_time-3600)) between TIMESTAMP '2019-09-01' and TIMESTAMP '2020-08-25'
             --and a.payment_channel_id not in (31001, 31000,21074)													
             and a.memo <> 'test'													
@@ -201,7 +208,15 @@ with
             100021040,100021041,100021042,100021043,100001,110012,210001,210002,210003,210004,													
             210005,210006,210007,210008,210009,210010,210011,210013,210014,210015,210016,210017,													
             210018,21031,21032,21033,21034,21035,21039,10200077,10200086,10200092,10200097,11000001,11000002,													
-            310001,310002,11000003,100021013,100021014,100021015,21070,21011,31000,31001,21074)													
+            310001,310002,11000003,100021013,100021014,100021015,21070,21011,31000,31001,21074,
+            379017, --kotoro
+            379004, --Payoo CsB Dynamic
+            379001, --boft
+            379003, --7eleven
+            379041, --vufood
+            379043, --Kootoro Smart POS
+            379047 --BsC 1024746 - AIRPAY-41983
+            )													
             and not (payment_payable_amount < 2000000000 and a.payment_channel_id in (21070,21071))													
             group by 1				
             order by 1
