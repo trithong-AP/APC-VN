@@ -57,7 +57,7 @@ with
             ,sum(case when category in ('bhd') then amount end) movie_gtv
             --,sum(case when category in ('Shopee') and (amount*23250000000) <10 then 1 end) shopee_game1d_txn
 
-            ,sum(case when category in ('QR') then cashback end) cashback_amount
+            ,sum(case when category in ('QR') then cashback+topup_coins_amount end) cashback_amount
             ,round(sum(															
             (case when category not in ('QR', 'other_games', 'Shopee', 'foody') then --theo đk câu cũ
                 case														
@@ -71,19 +71,8 @@ with
                 else cast(1 as double) end
             
             end) *
-            (payment_payable_amount - currency_amount)),2) +												
+            (payment_payable_amount - currency_amount)),2) +
             round(sum(case when category not in ('QR', 'other_games', 'Shopee', 'foody') then cashback end),2) as inapp_cost
-
-            -- ,sum(case 
-            -- when (payment_channel_id in (20115,30101) and amount = (10000/23250)) then (0.98*amount - currency_amount) -- viettel 10K 2%
-            -- when (payment_channel_id in (20115,30101) and amount > (10000/23250)) then (0.97*amount - currency_amount) -- other viettel 3%
-            -- when (payment_channel_id in (20111,30102)) then (0.954*amount - currency_amount) -- vina 4.6%
-            -- when (payment_channel_id in (20112,30103)) then (0.956*amount - currency_amount) -- mobi 4.4%
-            -- when (payment_channel_id in (20113,30105)) then (0.94*amount - currency_amount) -- gmobile 6%
-            -- when (payment_channel_id in (20114)) then (0.94*amount - currency_amount) -- vietnamobile airtime 6%
-            -- when (payment_channel_id in (30104)) then (0.93*amount - currency_amount) -- vietnamobile epin 7%
-            -- else 0.0 end) as telco_discount
-            -- ,sum(case when payment_channel_id in (20001,24001,24004,24008,24009,310004,310009) then (amount*0.05) else 0 end) gppc_discount
 
         from
             select_date sd
@@ -98,6 +87,8 @@ with
                 tb1.payment_payable_amount/1000000/cast(23250 as double) as payment_payable_amount,
                 tb1.payment_cash_amount/1000000/cast(23250 as double) as cashback,
                 currency_amount/1000000/cast(23250 as double) currency_amount,
+                topup_coins_amount/1000000/cast(23250 as double) topup_coins_amount,
+                payment_coins_num/1000000/cast(23250 as double) payment_coins_num,
                 tb1.payment_channel_id,
                 case when tb1.payment_channel_id in (20111, 20112, 20113, 20114, 20115, 30101, 30102, 30103, 30104, 30105, 30350, 30351) then 'telco'
                 when substr(cast(tb1.payment_channel_id as varchar),1,2) = '32' and tb1.payment_channel_id not in (32033,32034,32037,32078,32079,32080,32081,32148,32149,32150,32158) then 'bill_uti'
@@ -109,7 +100,7 @@ with
                 when tb1.payment_channel_id in (30002,30003,30004,30005,30006,30007,30008,30009,30010,30011,30012,30013,30014,30015,30016,30017,30018,30019,30020,30021,30022,30023) then 'other_games'
                 when tb1.payment_channel_id in (500001) then 'Shopee'
                 when tb1.payment_channel_id in (21001) then 'P2P'
-                when tb1.payment_channel_id in (21070) then 'QR'
+                when tb1.payment_channel_id in (21071) then 'QR'
                 when tb1.payment_channel_id in (35001) then 'bhd'
                 else 'other' end as category,
                 tb1.extra_data,
@@ -139,7 +130,7 @@ with
                 379047 --BsC 1024746 - AIRPAY-41983
                 )
                 and not (payment_payable_amount < 2000000000 and tb1.payment_channel_id in (21070))
-                and not (payment_payable_amount < 100000000 and tb1.payment_channel_id =500001)
+                and not (payment_payable_amount < 100000000 and tb1.payment_channel_id = 500001)
             ) a on a.date = sd.date
         group by 1
     ),
